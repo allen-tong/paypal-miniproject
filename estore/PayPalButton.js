@@ -22,7 +22,8 @@ export default class PayPalButton extends Component<{}> {
       cards: [],
       total: 0.0,
       payViewActive: false,
-      addressListActive: false
+      addressListActive: false,
+      cardListActive: false
     };
   }
 
@@ -55,12 +56,19 @@ export default class PayPalButton extends Component<{}> {
   }
 
   openAddressList() {
-    this.getInfo();
     this.setState({addressListActive: true});
   }
 
   closeAddressList() {
     this.setState({addressListActive: false});
+  }
+
+  openCardList() {
+    this.setState({cardListActive: true});
+  }
+
+  closeCardList() {
+    this.setState({cardListActive: false});
   }
 
   _onPress() {
@@ -69,7 +77,7 @@ export default class PayPalButton extends Component<{}> {
 
   render() {
     return (
-      <View style={styles.container}>
+      <View>
         <Button
           onPress={() => this.openPayView()}
           title='Pay with PayPal'
@@ -95,7 +103,7 @@ export default class PayPalButton extends Component<{}> {
             <Modal
               visible={this.state.addressListActive}
               animationType={'slide'}
-              onRequestClose={() => this.closePayView()}
+              onRequestClose={() => this.closeAddressList()}
             >
               <FlatList
                 data={this.state.addresses}
@@ -115,7 +123,7 @@ export default class PayPalButton extends Component<{}> {
             </Modal>
             <TouchableHighlight
               underlayColor='white'
-              onPress={this._onPress}
+              onPress={() => this.openCardList()}
             >
               <Text>
                 {
@@ -125,6 +133,33 @@ export default class PayPalButton extends Component<{}> {
                 }
               </Text>
             </TouchableHighlight>
+            <Modal
+              visible={this.state.cardListActive}
+              animationType={'slide'}
+              onRequestClose={() => this.closeCardList()}
+            >
+              <FlatList
+                data={this.state.cards}
+                renderItem={({item}) => (
+                  <TouchableHighlight
+                    underlayColor='white'
+                    onPress={() => {
+                      this.setState(
+                        item !== this.state.backupCard ?
+                          {activeCard: item}
+                          : {
+                              backupCard: this.state.activeCard,
+                              activeCard: item
+                            });
+                      this.closeCardList();
+                    }}
+                  >
+                    <Text>{item}</Text>
+                  </TouchableHighlight>
+                )}
+                keyExtractor={(item) => item.toString()}
+              />
+            </Modal>
             <TouchableHighlight
               underlayColor='white'
               onPress={this._onPress}
