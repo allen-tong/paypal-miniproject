@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   Alert,
   Button,
+  FlatList,
   Modal,
   StyleSheet,
   Text,
@@ -14,34 +15,52 @@ export default class PayPalButton extends Component<{}> {
     super(props);
     this.state = {
       name: '',
+      activeAddress: '',
+      activeCard: '',
+      backupCard: '',
       addresses: [],
       cards: [],
       total: 0.0,
-      modalVisible: false,
+      payViewActive: false,
+      addressListActive: false
     };
   }
 
-  openModal(responseJson) {
-    this.setState({
-      name: responseJson.name,
-      addresses: responseJson.addresses,
-      cards: responseJson.cards,
-      total: responseJson.total,
-      modalVisible:true
-    });
-  }
-
-  closeModal() {
-    this.setState({modalVisible:false});
-  }
-
-  pay() {
+  getInfo() {
     fetch('http://10.0.2.2:3000/pay')
       .then((response) => response.json())
-      .then((responseJson) => this.openModal(responseJson))
+      .then((responseJson) => {
+        this.setState({
+          name: responseJson.name,
+          activeAddress: responseJson.addresses[0],
+          activeCard: responseJson.cards[0],
+          backupCard: responseJson.cards[1],
+          addresses: responseJson.addresses,
+          cards: responseJson.cards,
+          total: responseJson.total
+        });
+      })
       .catch((error) => {
         console.error(error);
       });
+  }
+
+  openPayView(responseJson) {
+    this.getInfo();
+    this.setState({payViewActive: true});
+  }
+
+  closePayView() {
+    this.setState({payViewActive: false});
+  }
+
+  openAddressList() {
+    this.getInfo();
+    this.setState({addressListActive: true});
+  }
+
+  closeAddressList() {
+    this.setState({addressListActive: false});
   }
 
   _onPress() {
@@ -52,29 +71,48 @@ export default class PayPalButton extends Component<{}> {
     return (
       <View style={styles.container}>
         <Button
-          onPress={() => this.pay()}
+          onPress={() => this.openPayView()}
           title='Pay with PayPal'
         />
         <Modal
-          visible={this.state.modalVisible}
+          visible={this.state.payViewActive}
           animationType={'slide'}
-          onRequestClose={() => {
-            this.closeModal();
-          }}
+          onRequestClose={() => this.closePayView()}
         >
           <View style={styles.modal}>
             <TouchableHighlight
               underlayColor='white'
-              onPress={this._onPress}
+              onPress={() => this.openAddressList()}
             >
               <Text>
                 {
                   'Ship to\n' +
                   this.state.name + '\n' +
-                  this.state.addresses[0]
+                  this.state.activeAddress
                 }
               </Text>
             </TouchableHighlight>
+            <Modal
+              visible={this.state.addressListActive}
+              animationType={'slide'}
+              onRequestClose={() => this.closePayView()}
+            >
+              <FlatList
+                data={this.state.addresses}
+                renderItem={({item}) => (
+                  <TouchableHighlight
+                    underlayColor='white'
+                    onPress={() => {
+                      this.setState({activeAddress: item});
+                      this.closeAddressList();
+                    }}
+                  >
+                    <Text>{item}</Text>
+                  </TouchableHighlight>
+                )}
+                keyExtractor={(item) => item.toString()}
+              />
+            </Modal>
             <TouchableHighlight
               underlayColor='white'
               onPress={this._onPress}
@@ -82,8 +120,8 @@ export default class PayPalButton extends Component<{}> {
               <Text>
                 {
                   'Pay with\n' +
-                  this.state.cards[0] + '\n' +
-                  this.state.cards[1] + ' (backup)'
+                  this.state.activeCard + '\n' +
+                  this.state.backupCard + ' (backup)'
                 }
               </Text>
             </TouchableHighlight>
@@ -104,7 +142,7 @@ export default class PayPalButton extends Component<{}> {
             </Text>
             <Button
               onPress={() => {
-                this.closeModal();
+                this.closePayView();
                 Alert.alert('Thank you for shopping with us!');
               }}
               title='Pay Now'
