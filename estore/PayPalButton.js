@@ -92,13 +92,11 @@ export default class PayPalButton extends Component<{}> {
               underlayColor='white'
               onPress={() => this.openAddressList()}
             >
-              <Text>
-                {
-                  'Ship to\n' +
-                  this.state.name + '\n' +
-                  this.state.activeAddress
-                }
-              </Text>
+              <View style={styles.textElement}>
+                <Text style={styles.headerText}>Ship to</Text>
+                <Text style={styles.mainText}>{this.state.name}</Text>
+                <Text>{this.state.activeAddress}</Text>
+              </View>
             </TouchableHighlight>
             <Modal
               visible={this.state.addressListActive}
@@ -115,7 +113,9 @@ export default class PayPalButton extends Component<{}> {
                       this.closeAddressList();
                     }}
                   >
-                    <Text>{item}</Text>
+                    <Text style={[styles.textElement, styles.mainText]}>
+                      {item}
+                    </Text>
                   </TouchableHighlight>
                 )}
                 keyExtractor={(item) => item.toString()}
@@ -125,13 +125,11 @@ export default class PayPalButton extends Component<{}> {
               underlayColor='white'
               onPress={() => this.openCardList()}
             >
-              <Text>
-                {
-                  'Pay with\n' +
-                  this.state.activeCard + '\n' +
-                  this.state.backupCard + ' (backup)'
-                }
-              </Text>
+              <View style={styles.textElement}>
+                <Text style={styles.headerText}>Pay with</Text>
+                <Text style={styles.mainText}>{this.state.activeCard}</Text>
+                <Text>{this.state.backupCard + ' (backup)'}</Text>
+              </View>
             </TouchableHighlight>
             <Modal
               visible={this.state.cardListActive}
@@ -154,7 +152,9 @@ export default class PayPalButton extends Component<{}> {
                       this.closeCardList();
                     }}
                   >
-                    <Text>{item}</Text>
+                    <Text style={[styles.textElement, styles.mainText]}>
+                      {item}
+                    </Text>
                   </TouchableHighlight>
                 )}
                 keyExtractor={(item) => item.toString()}
@@ -164,17 +164,18 @@ export default class PayPalButton extends Component<{}> {
               underlayColor='white'
               onPress={this._onPress}
             >
-              <Text>
-                {
-                  'Total ' + '$' + this.state.total
-                }
-              </Text>
+              <View style={[styles.textElement, {flexDirection: 'row'}]}>
+                <Text style={styles.headerText}>Total</Text>
+                <Text style={styles.headerText}>{'$' + this.state.total}</Text>
+              </View>
             </TouchableHighlight>
-            <Text>
-              {
-                'View PayPal Policies and your payment method rights.\n'
-              }
-            </Text>
+            <View style={styles.textElement}>
+              <Text>
+                View
+                <Text style={styles.link}> PayPal Policies </Text>
+                and your payment method rights.
+              </Text>
+            </View>
             <Button
               onPress={() => {
                 this.closePayView();
@@ -182,11 +183,13 @@ export default class PayPalButton extends Component<{}> {
               }}
               title='Pay Now'
             />
-            <Text>
-              If money is added to your PayPal balance before this transaction
-              completes, the additional balance may be used to complete your
-              payment. Learn More.
-            </Text>
+            <View style={styles.textElement}>
+              <Text>
+                If money is added to your PayPal balance before this transaction
+                completes, the additional balance may be used to complete your
+                payment. <Text style={styles.link}>Learn More.</Text>
+              </Text>
+            </View>
           </View>
         </Modal>
       </View>
@@ -196,6 +199,22 @@ export default class PayPalButton extends Component<{}> {
 
 const styles = StyleSheet.create({
   modal: {
-    padding: 30
+    flex: 1,
+    padding: 20
+  },
+  textElement: {
+    justifyContent: 'space-between',
+    padding: 10
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  mainText: {
+    fontSize: 18
+  },
+  link: {
+    fontWeight: 'bold',
+    color: 'cornflowerblue'
   }
 });
