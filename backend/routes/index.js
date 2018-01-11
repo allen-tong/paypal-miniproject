@@ -5,8 +5,7 @@ var router = express.Router();
 var user = {
   name: 'Kenneth Thompson',
   addresses: ['8114 Grow Drive #9, Cape Neddick, ME 03902'],
-  cards: ['BANK OF AMERICA CHECKING x-5567', 'Visa x-4512'],
-  total: 28.98
+  cards: ['BANK OF AMERICA CHECKING x-5567', 'Visa x-4512']
 };
 
 /* GET home page. */

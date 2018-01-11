@@ -20,10 +20,11 @@ export default class PayPalButton extends Component<{}> {
       backupCard: '',
       addresses: [],
       cards: [],
-      total: 0.0,
+      total: 0.00,
       payViewActive: false,
       addressListActive: false,
-      cardListActive: false
+      cardListActive: false,
+      cartViewActive: false
     };
   }
 
@@ -71,8 +72,12 @@ export default class PayPalButton extends Component<{}> {
     this.setState({cardListActive: false});
   }
 
-  _onPress() {
-    Alert.alert('Pressed!');
+  openCartView() {
+    this.setState({cartViewActive: true});
+  }
+
+  closeCartView() {
+    this.setState({cartViewActive: false});
   }
 
   render() {
@@ -103,23 +108,25 @@ export default class PayPalButton extends Component<{}> {
               animationType={'slide'}
               onRequestClose={() => this.closeAddressList()}
             >
-              <FlatList
-                data={this.state.addresses}
-                renderItem={({item}) => (
-                  <TouchableHighlight
-                    underlayColor='white'
-                    onPress={() => {
-                      this.setState({activeAddress: item});
-                      this.closeAddressList();
-                    }}
-                  >
-                    <Text style={[styles.textElement, styles.mainText]}>
-                      {item}
-                    </Text>
-                  </TouchableHighlight>
-                )}
-                keyExtractor={(item) => item.toString()}
-              />
+              <View style={styles.modal}>
+                <FlatList
+                  data={this.state.addresses}
+                  renderItem={({item}) => (
+                    <TouchableHighlight
+                      underlayColor='white'
+                      onPress={() => {
+                        this.setState({activeAddress: item});
+                        this.closeAddressList();
+                      }}
+                    >
+                      <Text style={[styles.textElement, styles.mainText]}>
+                        {item}
+                      </Text>
+                    </TouchableHighlight>
+                  )}
+                  keyExtractor={(item) => item.toString()}
+                />
+              </View>
             </Modal>
             <TouchableHighlight
               underlayColor='white'
@@ -136,39 +143,97 @@ export default class PayPalButton extends Component<{}> {
               animationType={'slide'}
               onRequestClose={() => this.closeCardList()}
             >
-              <FlatList
-                data={this.state.cards}
-                renderItem={({item}) => (
-                  <TouchableHighlight
-                    underlayColor='white'
-                    onPress={() => {
-                      this.setState(
-                        item !== this.state.backupCard ?
-                          {activeCard: item}
-                          : {
-                              backupCard: this.state.activeCard,
-                              activeCard: item
-                            });
-                      this.closeCardList();
-                    }}
-                  >
-                    <Text style={[styles.textElement, styles.mainText]}>
-                      {item}
-                    </Text>
-                  </TouchableHighlight>
-                )}
-                keyExtractor={(item) => item.toString()}
-              />
+              <View style={styles.modal}>
+                <FlatList
+                  data={this.state.cards}
+                  renderItem={({item}) => (
+                    <TouchableHighlight
+                      underlayColor='white'
+                      onPress={() => {
+                        this.setState(
+                          item !== this.state.backupCard ?
+                            {activeCard: item}
+                            : {
+                                backupCard: this.state.activeCard,
+                                activeCard: item
+                              });
+                        this.closeCardList();
+                      }}
+                    >
+                      <Text style={[styles.textElement, styles.mainText]}>
+                        {item}
+                      </Text>
+                    </TouchableHighlight>
+                  )}
+                  keyExtractor={(item) => item.toString()}
+                />
+              </View>
             </Modal>
             <TouchableHighlight
               underlayColor='white'
-              onPress={this._onPress}
+              onPress={() => {this.openCartView()}}
             >
-              <View style={[styles.textElement, {flexDirection: 'row'}]}>
+              <View style={styles.splitLeftRight}>
                 <Text style={styles.headerText}>Total</Text>
-                <Text style={styles.headerText}>{'$' + this.state.total}</Text>
+                <Text style={styles.headerText}>
+                  {'$' + this.props.cart.total.toFixed(2)}
+                </Text>
               </View>
             </TouchableHighlight>
+            <Modal
+              visible={this.state.cartViewActive}
+              animationType={'slide'}
+              onRequestClose={() => this.closeCartView()}
+            >
+              <View style={styles.modal}>
+                <View style={styles.textElement}>
+                  <Text style={styles.headerText}>Items</Text>
+                  <FlatList
+                    data={this.props.cart.items}
+                    renderItem={({item}) => (
+                      <Text style={styles.cartItem}>{item.name}</Text>
+                    )}
+                    keyExtractor={(item) => item.id}
+                  />
+                </View>
+                <View style={styles.splitLeftRight}>
+                  <Text style={styles.headerText}>Subtotal</Text>
+                  <Text style={styles.headerText}>
+                    {'$' + this.props.cart.subtotal.toFixed(2)}
+                  </Text>
+                </View>
+                <View style={styles.splitLeftRight}>
+                  <Text style={styles.headerText}>Tax</Text>
+                  <Text style={styles.headerText}>
+                    {'$' + this.props.cart.tax.toFixed(2)}
+                  </Text>
+                </View>
+                <View style={styles.splitLeftRight}>
+                  <Text style={styles.headerText}>Shipping</Text>
+                  <Text style={styles.headerText}>
+                    {'$' + this.props.cart.shipping.toFixed(2)}
+                  </Text>
+                </View>
+                <View style={styles.splitLeftRight}>
+                  <Text style={styles.headerText}>Discount</Text>
+                  <Text style={styles.headerText}>
+                    {'$' + this.props.cart.discount.toFixed(2)}
+                  </Text>
+                </View>
+                <View style={styles.splitLeftRight}>
+                  <Text style={styles.headerText}>Total</Text>
+                  <Text style={styles.headerText}>
+                    {'$' + this.props.cart.total.toFixed(2)}
+                  </Text>
+                </View>
+                <View style={{paddingVertical: 10}}>
+                  <Button
+                    onPress={() => {this.closeCartView()}}
+                    title='Back to checkout'
+                  />
+                </View>
+              </View>
+            </Modal>
             <View style={styles.textElement}>
               <Text>
                 View
@@ -184,7 +249,7 @@ export default class PayPalButton extends Component<{}> {
               title='Pay Now'
             />
             <View style={styles.textElement}>
-              <Text>
+              <Text style={{fontSize: 12}}>
                 If money is added to your PayPal balance before this transaction
                 completes, the additional balance may be used to complete your
                 payment. <Text style={styles.link}>Learn More.</Text>
@@ -200,11 +265,12 @@ export default class PayPalButton extends Component<{}> {
 const styles = StyleSheet.create({
   modal: {
     flex: 1,
-    padding: 20
+    paddingHorizontal: 30,
+    paddingVertical: 20
   },
   textElement: {
     justifyContent: 'space-between',
-    padding: 10
+    paddingVertical: 10
   },
   headerText: {
     fontSize: 18,
@@ -212,6 +278,15 @@ const styles = StyleSheet.create({
   },
   mainText: {
     fontSize: 18
+  },
+  splitLeftRight: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10
+  },
+  cartItem: {
+    fontSize: 18,
+    paddingHorizontal: 10
   },
   link: {
     fontWeight: 'bold',

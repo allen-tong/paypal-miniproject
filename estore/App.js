@@ -7,6 +7,24 @@ import {
 import PayPalButton from './PayPalButton';
 
 export default class App extends Component<{}> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      cart: {
+        items: [
+          {id: 1, name: 'Screen protector', quantity: 2, price: 7.98},
+          {id: 2, name: 'Phone case', quantity: 1, price: 8.98},
+          {id: 3, name: 'Portable charger', quantity: 1, price: 10.98}
+        ],
+        subtotal: 35.92,
+        tax: 3.06,
+        shipping: 0.00,
+        discount: 10.00,
+        total: 28.98
+      }
+    }
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -19,7 +37,7 @@ export default class App extends Component<{}> {
           Wow, you found some nice stuff! Let's buy it.{'\n\n'}
         </Text>
         <View style={styles.button}>
-          <PayPalButton />
+          <PayPalButton breakdown={true} cart={this.state.cart}/>
         </View>
       </View>
     );
@@ -28,7 +46,7 @@ export default class App extends Component<{}> {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    paddingHorizontal: 5
   },
   button: {
     justifyContent: 'center',
