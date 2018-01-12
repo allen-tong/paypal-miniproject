@@ -101,10 +101,13 @@ export default class PayPalButton extends Component<{}> {
               underlayColor='white'
               onPress={() => this.openAddressList()}
             >
-              <View style={styles.textElement}>
-                <Text style={styles.headerText}>Ship to</Text>
-                <Text style={styles.mainText}>{this.state.name}</Text>
-                <Text>{this.state.activeAddress}</Text>
+              <View style={styles.selectable}>
+                <View style={styles.textElement}>
+                  <Text style={styles.headerText}>Ship to</Text>
+                  <Text style={styles.mainText}>{this.state.name}</Text>
+                  <Text>{this.state.activeAddress}</Text>
+                </View>
+                <Text style={styles.rightAngle}>{rightAngle}</Text>
               </View>
             </TouchableHighlight>
             <Modal
@@ -136,10 +139,13 @@ export default class PayPalButton extends Component<{}> {
               underlayColor='white'
               onPress={() => this.openCardList()}
             >
-              <View style={styles.textElement}>
-                <Text style={styles.headerText}>Pay with</Text>
-                <Text style={styles.mainText}>{this.state.activeCard}</Text>
-                <Text>{this.state.backupCard + ' (backup)'}</Text>
+              <View style={styles.selectable}>
+                <View style={styles.textElement}>
+                  <Text style={styles.headerText}>Pay with</Text>
+                  <Text style={styles.mainText}>{this.state.activeCard}</Text>
+                  <Text>{this.state.backupCard + ' (backup)'}</Text>
+                </View>
+                <Text style={styles.rightAngle}>{rightAngle}</Text>
               </View>
             </TouchableHighlight>
             <Modal
@@ -180,7 +186,8 @@ export default class PayPalButton extends Component<{}> {
               <View style={styles.splitRow}>
                 <Text style={styles.headerText}>Total</Text>
                 <Text style={styles.headerText}>
-                  {'$' + this.props.cart.total.toFixed(2)}
+                  {'$' + this.props.cart.total.toFixed(2) + '   '}
+                  <Text style={styles.rightAngle}>{rightAngle}</Text>
                 </Text>
               </View>
             </TouchableHighlight>
@@ -190,6 +197,7 @@ export default class PayPalButton extends Component<{}> {
               onRequestClose={() => this.closeCartView()}
             >
               <View style={styles.modal}>
+                <Text style={styles.cartHeader}>MY SHOPPING CART</Text>
                 <Text style={styles.headerText}>Items</Text>
                 <View style={styles.splitRow}>
                   <FlatList
@@ -284,13 +292,19 @@ export default class PayPalButton extends Component<{}> {
   }
 }
 
+const rightAngle = String.fromCharCode(10217);
+
 const styles = StyleSheet.create({
   modal: {
     flex: 1,
     paddingHorizontal: 30,
     paddingVertical: 20
   },
+  selectable: {
+    flexDirection: 'row', justifyContent: 'space-between'
+  },
   textElement: {
+    flexDirection: 'column',
     justifyContent: 'space-between',
     paddingVertical: 10
   },
@@ -301,10 +315,22 @@ const styles = StyleSheet.create({
   mainText: {
     fontSize: 18
   },
+  rightAngle: {
+    alignSelf: 'center',
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'cornflowerblue'
+  },
   splitRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 10
+  },
+  cartHeader: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    alignSelf: 'center',
+    paddingBottom: 10
   },
   cartItem: {
     fontSize: 18,
