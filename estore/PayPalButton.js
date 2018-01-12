@@ -4,6 +4,7 @@ import {
   Button,
   FlatList,
   Modal,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableHighlight,
@@ -96,7 +97,7 @@ export default class PayPalButton extends Component<{}> {
           animationType={'slide'}
           onRequestClose={() => this.closePayView()}
         >
-          <View style={styles.modal}>
+          <ScrollView style={styles.modal}>
             <TouchableHighlight
               underlayColor='white'
               onPress={() => this.openAddressList()}
@@ -196,7 +197,7 @@ export default class PayPalButton extends Component<{}> {
               animationType={'slide'}
               onRequestClose={() => this.closeCartView()}
             >
-              <View style={styles.modal}>
+              <ScrollView style={styles.modal}>
                 <Text style={styles.cartHeader}>MY SHOPPING CART</Text>
                 <Text style={styles.headerText}>Items</Text>
                 <View style={styles.splitRow}>
@@ -256,13 +257,13 @@ export default class PayPalButton extends Component<{}> {
                     {'$' + this.props.cart.total.toFixed(2)}
                   </Text>
                 </View>
-                <View style={{paddingVertical: 10}}>
+                <View style={{height: 100, paddingVertical: 10}}>
                   <Button
                     onPress={() => {this.closeCartView()}}
                     title='Back to checkout'
                   />
                 </View>
-              </View>
+              </ScrollView>
             </Modal>
             <View style={styles.textElement}>
               <Text>
@@ -285,7 +286,7 @@ export default class PayPalButton extends Component<{}> {
                 payment. <Text style={styles.link}>Learn More.</Text>
               </Text>
             </View>
-          </View>
+          </ScrollView>
         </Modal>
       </View>
     );
