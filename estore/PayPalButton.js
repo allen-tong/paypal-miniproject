@@ -13,6 +13,10 @@ import {
 export default class PayPalButton extends Component<{}> {
   constructor(props) {
     super(props);
+    const cartItems = [
+      {id: 0, name: 'Name', quantity: 'Quantity', price: 'Price'}
+    ];
+    this.props.cart.items = cartItems.concat(this.props.cart.items);
     this.state = {
       name: '',
       activeAddress: '',
@@ -173,7 +177,7 @@ export default class PayPalButton extends Component<{}> {
               underlayColor='white'
               onPress={() => {this.openCartView()}}
             >
-              <View style={styles.splitLeftRight}>
+              <View style={styles.splitRow}>
                 <Text style={styles.headerText}>Total</Text>
                 <Text style={styles.headerText}>
                   {'$' + this.props.cart.total.toFixed(2)}
@@ -186,8 +190,8 @@ export default class PayPalButton extends Component<{}> {
               onRequestClose={() => this.closeCartView()}
             >
               <View style={styles.modal}>
-                <View style={styles.textElement}>
-                  <Text style={styles.headerText}>Items</Text>
+                <Text style={styles.headerText}>Items</Text>
+                <View style={styles.splitRow}>
                   <FlatList
                     data={this.props.cart.items}
                     renderItem={({item}) => (
@@ -195,32 +199,50 @@ export default class PayPalButton extends Component<{}> {
                     )}
                     keyExtractor={(item) => item.id}
                   />
+                  <FlatList
+                    data={this.props.cart.items}
+                    renderItem={({item}) => (
+                      <Text style={styles.cartQuantity}>{item.quantity}</Text>
+                    )}
+                    keyExtractor={(item) => item.id}
+                  />
+                  <FlatList
+                    data={this.props.cart.items}
+                    renderItem={({item}) => (
+                      <Text style={styles.cartPrice}>
+                        {item.id === 0 ?
+                          item.price
+                          : '$' + item.price.toFixed(2)}
+                      </Text>
+                    )}
+                    keyExtractor={(item) => item.id}
+                  />
                 </View>
-                <View style={styles.splitLeftRight}>
+                <View style={styles.splitRow}>
                   <Text style={styles.headerText}>Subtotal</Text>
                   <Text style={styles.headerText}>
                     {'$' + this.props.cart.subtotal.toFixed(2)}
                   </Text>
                 </View>
-                <View style={styles.splitLeftRight}>
+                <View style={styles.splitRow}>
                   <Text style={styles.headerText}>Tax</Text>
                   <Text style={styles.headerText}>
                     {'$' + this.props.cart.tax.toFixed(2)}
                   </Text>
                 </View>
-                <View style={styles.splitLeftRight}>
+                <View style={styles.splitRow}>
                   <Text style={styles.headerText}>Shipping</Text>
                   <Text style={styles.headerText}>
                     {'$' + this.props.cart.shipping.toFixed(2)}
                   </Text>
                 </View>
-                <View style={styles.splitLeftRight}>
+                <View style={styles.splitRow}>
                   <Text style={styles.headerText}>Discount</Text>
                   <Text style={styles.headerText}>
                     {'$' + this.props.cart.discount.toFixed(2)}
                   </Text>
                 </View>
-                <View style={styles.splitLeftRight}>
+                <View style={styles.splitRow}>
                   <Text style={styles.headerText}>Total</Text>
                   <Text style={styles.headerText}>
                     {'$' + this.props.cart.total.toFixed(2)}
@@ -279,14 +301,22 @@ const styles = StyleSheet.create({
   mainText: {
     fontSize: 18
   },
-  splitLeftRight: {
+  splitRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 10
   },
   cartItem: {
     fontSize: 18,
-    paddingHorizontal: 10
+    paddingLeft: 10
+  },
+  cartQuantity: {
+    fontSize: 18,
+    alignSelf: 'center'
+  },
+  cartPrice: {
+    fontSize: 18,
+    alignSelf: 'flex-end'
   },
   link: {
     fontWeight: 'bold',
