@@ -18,8 +18,8 @@ export default class App extends Component<{}> {
         ],
         subtotal: 35.92,
         tax: 3.06,
-        shipping: 0.00,
-        discount: 10.00,
+        shipping: 5.00,
+        discount: -15.00,
         total: 28.98
       }
     }
@@ -37,7 +37,7 @@ export default class App extends Component<{}> {
           Wow, you found some nice stuff! Let's buy it.{'\n\n'}
         </Text>
         <View style={styles.button}>
-          <PayPalButton breakdown={true} cart={this.state.cart}/>
+          <PayPalButton cart={this.state.cart}/>
         </View>
       </View>
     );

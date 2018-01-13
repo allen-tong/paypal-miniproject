@@ -14,10 +14,12 @@ import {
 export default class PayPalButton extends Component<{}> {
   constructor(props) {
     super(props);
-    const cartItems = [
-      {id: 0, name: 'Name', quantity: 'Quantity', price: 'Price'}
-    ];
-    this.props.cart.items = cartItems.concat(this.props.cart.items);
+    if (this.props.cart.items) {
+      const cartItems = [
+        {id: -1, name: 'Name', quantity: 'Quantity', price: 'Price'}
+      ];
+      this.props.cart.items = cartItems.concat(this.props.cart.items);
+    }
     this.state = {
       name: '',
       activeAddress: '',
@@ -41,7 +43,7 @@ export default class PayPalButton extends Component<{}> {
           name: responseJson.name,
           activeAddress: responseJson.addresses[0],
           activeCard: responseJson.cards[0],
-          backupCard: responseJson.cards[1],
+          backupCard: responseJson.cards[1] ? responseJson.cards[1] : null,
           addresses: responseJson.addresses,
           cards: responseJson.cards,
           total: responseJson.total
@@ -83,6 +85,14 @@ export default class PayPalButton extends Component<{}> {
 
   closeCartView() {
     this.setState({cartViewActive: false});
+  }
+
+  toPrice(price) {
+    return (
+      (price >= 0) ?
+        '$' + price.toFixed(2)
+        : '-$' + (-price).toFixed(2)
+    );
   }
 
   render() {
@@ -144,7 +154,11 @@ export default class PayPalButton extends Component<{}> {
                 <View style={styles.textElement}>
                   <Text style={styles.headerText}>Pay with</Text>
                   <Text style={styles.mainText}>{this.state.activeCard}</Text>
-                  <Text>{this.state.backupCard + ' (backup)'}</Text>
+                  <Text>{
+                    this.state.backupCard ?
+                      this.state.backupCard + ' (backup)'
+                      : ''
+                  }</Text>
                 </View>
                 <Text style={styles.rightAngle}>{rightAngle}</Text>
               </View>
@@ -155,29 +169,64 @@ export default class PayPalButton extends Component<{}> {
               onRequestClose={() => this.closeCardList()}
             >
               <View style={styles.modal}>
-                <FlatList
-                  data={this.state.cards}
-                  renderItem={({item}) => (
-                    <TouchableHighlight
-                      underlayColor='white'
-                      onPress={() => {
-                        this.setState(
-                          item !== this.state.backupCard ?
-                            {activeCard: item}
-                            : {
-                                backupCard: this.state.activeCard,
-                                activeCard: item
-                              });
-                        this.closeCardList();
-                      }}
-                    >
-                      <Text style={[styles.textElement, styles.mainText]}>
-                        {item}
-                      </Text>
-                    </TouchableHighlight>
-                  )}
-                  keyExtractor={(item) => item.toString()}
-                />
+                <View style={{flex: 0.5}}>
+                  <Text style={[styles.textElement, styles.headerText]}>
+                    Select primary card
+                  </Text>
+                  <FlatList
+                    data={this.state.cards}
+                    renderItem={({item}) => (
+                      <TouchableHighlight
+                        underlayColor='white'
+                        onPress={() => {
+                          this.setState(
+                            item !== this.state.backupCard ?
+                              {activeCard: item}
+                              : {
+                                  backupCard: this.state.activeCard,
+                                  activeCard: item
+                                });
+                          this.closeCardList();
+                        }}
+                      >
+                        <Text style={[styles.textElement, styles.mainText]}>
+                          {item}
+                        </Text>
+                      </TouchableHighlight>
+                    )}
+                    keyExtractor={(item) => item.toString()}
+                  />
+                </View>
+                {this.state.backupCard &&
+                  <View style={{flex: 0.5}}>
+                    <Text style={[styles.textElement, styles.headerText]}>
+                      Select backup card
+                    </Text>
+                    <FlatList
+                      data={this.state.cards}
+                      renderItem={({item}) => (
+                        <TouchableHighlight
+                          underlayColor='white'
+                          onPress={() => {
+                            this.setState(
+                              item !== this.state.activeCard ?
+                                {backupCard: item}
+                                : {
+                                    activeCard: this.state.backupCard,
+                                    backupCard: item
+                                  });
+                            this.closeCardList();
+                          }}
+                        >
+                          <Text style={[styles.textElement, styles.mainText]}>
+                            {item}
+                          </Text>
+                        </TouchableHighlight>
+                      )}
+                      keyExtractor={(item) => item.toString()}
+                    />
+                  </View>
+                }
               </View>
             </Modal>
             <TouchableHighlight
@@ -187,7 +236,7 @@ export default class PayPalButton extends Component<{}> {
               <View style={styles.splitRow}>
                 <Text style={styles.headerText}>Total</Text>
                 <Text style={styles.headerText}>
-                  {'$' + this.props.cart.total.toFixed(2) + '   '}
+                  {this.toPrice(this.props.cart.total) + '   '}
                   <Text style={styles.rightAngle}>{rightAngle}</Text>
                 </Text>
               </View>
@@ -199,62 +248,78 @@ export default class PayPalButton extends Component<{}> {
             >
               <ScrollView style={styles.modal}>
                 <Text style={styles.cartHeader}>MY SHOPPING CART</Text>
-                <Text style={styles.headerText}>Items</Text>
-                <View style={styles.splitRow}>
-                  <FlatList
-                    data={this.props.cart.items}
-                    renderItem={({item}) => (
-                      <Text style={styles.cartItem}>{item.name}</Text>
-                    )}
-                    keyExtractor={(item) => item.id}
-                  />
-                  <FlatList
-                    data={this.props.cart.items}
-                    renderItem={({item}) => (
-                      <Text style={styles.cartQuantity}>{item.quantity}</Text>
-                    )}
-                    keyExtractor={(item) => item.id}
-                  />
-                  <FlatList
-                    data={this.props.cart.items}
-                    renderItem={({item}) => (
-                      <Text style={styles.cartPrice}>
-                        {item.id === 0 ?
-                          item.price
-                          : '$' + item.price.toFixed(2)}
-                      </Text>
-                    )}
-                    keyExtractor={(item) => item.id}
-                  />
-                </View>
-                <View style={styles.splitRow}>
-                  <Text style={styles.headerText}>Subtotal</Text>
-                  <Text style={styles.headerText}>
-                    {'$' + this.props.cart.subtotal.toFixed(2)}
-                  </Text>
-                </View>
-                <View style={styles.splitRow}>
-                  <Text style={styles.headerText}>Tax</Text>
-                  <Text style={styles.headerText}>
-                    {'$' + this.props.cart.tax.toFixed(2)}
-                  </Text>
-                </View>
-                <View style={styles.splitRow}>
-                  <Text style={styles.headerText}>Shipping</Text>
-                  <Text style={styles.headerText}>
-                    {'$' + this.props.cart.shipping.toFixed(2)}
-                  </Text>
-                </View>
-                <View style={styles.splitRow}>
-                  <Text style={styles.headerText}>Discount</Text>
-                  <Text style={styles.headerText}>
-                    {'$' + this.props.cart.discount.toFixed(2)}
-                  </Text>
-                </View>
+                {this.props.cart.items &&
+                  <View>
+                    <Text style={styles.headerText}>Items</Text>
+                    <View style={styles.splitRow}>
+                      <FlatList
+                        data={this.props.cart.items}
+                        renderItem={({item}) => (
+                          <Text style={styles.cartItem}>{item.name}</Text>
+                        )}
+                        keyExtractor={(item) => item.id}
+                      />
+                      <FlatList
+                        data={this.props.cart.items}
+                        renderItem={({item}) => (
+                          <Text style={styles.cartQuantity}>
+                            {item.quantity}
+                          </Text>
+                        )}
+                        keyExtractor={(item) => item.id}
+                      />
+                      <FlatList
+                        data={this.props.cart.items}
+                        renderItem={({item}) => (
+                          <Text style={styles.cartPrice}>
+                            {item.id === -1 ?
+                              item.price
+                              : this.toPrice(item.price)}
+                          </Text>
+                        )}
+                        keyExtractor={(item) => item.id}
+                      />
+                    </View>
+                  </View>
+                }
+                {this.props.cart.subtotal &&
+                  <View style={styles.splitRow}>
+                    <Text style={styles.headerText}>Subtotal</Text>
+                    <Text style={styles.headerText}>
+                      {this.toPrice(this.props.cart.subtotal)}
+                    </Text>
+                  </View>
+                }
+                {this.props.cart.tax &&
+                  <View style={styles.splitRow}>
+                    <Text style={styles.headerText}>Tax</Text>
+                    <Text style={styles.headerText}>
+                      {this.toPrice(this.props.cart.tax)}
+                    </Text>
+                  </View>
+                }
+                {this.props.cart.shipping &&
+                  <View style={styles.splitRow}>
+                    <Text style={styles.headerText}>Shipping</Text>
+                    <Text style={styles.headerText}>
+                      {this.toPrice(this.props.cart.shipping)}
+                    </Text>
+                  </View>
+                }
+                {this.props.cart.discount &&
+                  <View style={styles.splitRow}>
+                    <Text style={styles.headerText}>
+                      Discounts & Special Offers
+                    </Text>
+                    <Text style={styles.headerText}>
+                      {this.toPrice(this.props.cart.discount)}
+                    </Text>
+                  </View>
+                }
                 <View style={styles.splitRow}>
                   <Text style={styles.headerText}>Total</Text>
                   <Text style={styles.headerText}>
-                    {'$' + this.props.cart.total.toFixed(2)}
+                    {this.toPrice(this.props.cart.total)}
                   </Text>
                 </View>
                 <View style={{height: 100, paddingVertical: 10}}>
