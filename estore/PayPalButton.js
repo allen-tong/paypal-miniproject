@@ -14,12 +14,6 @@ import {
 export default class PayPalButton extends Component<{}> {
   constructor(props) {
     super(props);
-    if (this.props.cart.items) {
-      const cartItems = [
-        {id: -1, name: 'Name', quantity: 'Quantity', price: 'Price'}
-      ];
-      this.props.cart.items = cartItems.concat(this.props.cart.items);
-    }
     this.state = {
       name: '',
       activeAddress: '',
@@ -253,14 +247,14 @@ export default class PayPalButton extends Component<{}> {
                     <Text style={styles.headerText}>Items</Text>
                     <View style={styles.splitRow}>
                       <FlatList
-                        data={this.props.cart.items}
+                        data={cartItems.concat(this.props.cart.items)}
                         renderItem={({item}) => (
                           <Text style={styles.cartItem}>{item.name}</Text>
                         )}
                         keyExtractor={(item) => item.id}
                       />
                       <FlatList
-                        data={this.props.cart.items}
+                        data={cartItems.concat(this.props.cart.items)}
                         renderItem={({item}) => (
                           <Text style={styles.cartQuantity}>
                             {item.quantity}
@@ -269,7 +263,7 @@ export default class PayPalButton extends Component<{}> {
                         keyExtractor={(item) => item.id}
                       />
                       <FlatList
-                        data={this.props.cart.items}
+                        data={cartItems.concat(this.props.cart.items)}
                         renderItem={({item}) => (
                           <Text style={styles.cartPrice}>
                             {item.id === -1 ?
@@ -340,7 +334,7 @@ export default class PayPalButton extends Component<{}> {
             <Button
               onPress={() => {
                 this.closePayView();
-                Alert.alert('Thank you for shopping with us!');
+                Alert.alert('Thanks for shopping with us!');
               }}
               title='Pay Now'
             />
@@ -356,9 +350,13 @@ export default class PayPalButton extends Component<{}> {
       </View>
     );
   }
-}
+};
 
 const rightAngle = String.fromCharCode(10217);
+
+const cartItems = [
+  {id: -1, name: 'Name', quantity: 'Quantity', price: 'Price'}
+];
 
 const styles = StyleSheet.create({
   modal: {

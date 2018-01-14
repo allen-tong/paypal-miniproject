@@ -1,16 +1,104 @@
 import React, { Component } from 'react';
 import {
+  Button,
+  FlatList,
+  Modal,
   StyleSheet,
   Text,
+  TouchableHighlight,
   View
 } from 'react-native';
 import PayPalButton from './PayPalButton';
 
-/* SHA-2 hash "tokens" for users */
-const users = {
-  user1: '0A041B9462CAA4A31BAC3567E0B6E6FD9100787DB2AB433D96F6D178CABFCE90',
-  user2: '6025D18FE48ABD45168528F18A82E265DD98D421A7084AA09F61B341703901A3'
-}
+export default class App extends Component<{}> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      userListActive: false,
+      user: 'guest'
+    }
+  }
+
+  openUserList() {
+    this.setState({userListActive: true});
+  }
+
+  closeUserList() {
+    this.setState({userListActive: false});
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+          <Text style={{fontSize: 20, paddingTop: 5}}>
+            {
+              this.state.user === 'guest' ?
+              'Not currently logged in. '
+              : 'Logged in as ' + database[this.state.user].name + '. '
+            }
+          </Text>
+          <View style={{alignSelf: 'center'}}>
+            <Button
+              onPress={() => this.openUserList()}
+              title={this.state.user === 'guest' ? 'Log In' : 'Switch User'}
+            />
+          </View>
+        </View>
+        <Modal
+          visible={this.state.userListActive}
+          animationType={'slide'}
+          onRequestClose={() => this.closeUserList()}
+        >
+          <View style={styles.modal}>
+            <FlatList
+              data={Object.keys(database)}
+              renderItem={({item}) => (
+                <TouchableHighlight
+                  underlayColor='white'
+                  onPress={() => {
+                    this.setState({user: item});
+                    this.closeUserList();
+                  }}
+                >
+                  <Text style={styles.listElement}>{database[item].name}</Text>
+                </TouchableHighlight>
+              )}
+              keyExtractor={(item) => item}
+            />
+            {this.state.user !== 'guest' &&
+              <Button
+                onPress={() => {
+                  this.setState({user: 'guest'});
+                  this.closeUserList();
+                }}
+                title='Log out'
+              />
+            }
+          </View>
+        </Modal>
+        {this.state.user !== 'guest' &&
+          <View>
+            <Text style={{fontSize: 50}}>
+              Shopping{'\n'}
+              and{'\n'}
+              things{'\n\n'}
+            </Text>
+            <Text style={{fontSize: 20}}>
+              Wow, you found some nice stuff! Let's buy it.{'\n\n'}
+            </Text>
+            <View style={styles.button}>
+              <PayPalButton
+                user={database[this.state.user].token}
+                cart={database[this.state.user].cart}
+              />
+            </View>
+          </View>
+        }
+      </View>
+    );
+  }
+};
 
 const cart1 = {
   items: [
@@ -37,40 +125,33 @@ const cart2 = {
   total: 20.16
 };
 
-export default class App extends Component<{}> {
-  constructor(props) {
-    super(props);
-    this.state = {
-      user: users.user1,
-      cart: cart1
-    }
+const database = {
+  user1: {
+    name: 'Kenneth',
+    cart: cart1,
+    token: '0A041B9462CAA4A31BAC3567E0B6E6FD9100787DB2AB433D96F6D178CABFCE90'
+  },
+  user2: {
+    name: 'Mitsuha',
+    cart: cart2,
+    token: '6025D18FE48ABD45168528F18A82E265DD98D421A7084AA09F61B341703901A3'
   }
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={{fontSize: 50}}>
-          Shopping{'\n'}
-          and{'\n'}
-          things{'\n\n'}
-        </Text>
-        <Text style={{fontSize: 20}}>
-          Wow, you found some nice stuff! Let's buy it.{'\n\n'}
-        </Text>
-        <View style={styles.button}>
-          <PayPalButton user={this.state.user} cart={this.state.cart}/>
-        </View>
-      </View>
-    );
-  }
-}
+};
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 5
+    padding: 5
+  },
+  modal: {
+    flex: 1,
+    padding: 25
+  },
+  listElement: {
+    fontSize: 18,
+    justifyContent: 'space-between',
+    paddingVertical: 10
   },
   button: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   }
 });

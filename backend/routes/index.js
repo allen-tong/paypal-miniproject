@@ -17,7 +17,7 @@ const userInfo2 = {
   name: 'Mitsuha Miyamizu',
   addresses: ['Itomori, Gifu Prefecture, Japan', 'Tokyo, Japan'],
   cards: ['MasterCard x-0123', 'American Express x-3456', 'Discover x-6789']
-}
+};
 
 const database = {};
 database[users.user1] = userInfo1;
