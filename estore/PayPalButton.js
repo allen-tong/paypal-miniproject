@@ -36,7 +36,7 @@ export default class PayPalButton extends Component<{}> {
   }
 
   getInfo() {
-    fetch('http://10.0.2.2:3000/pay')
+    fetch('http://10.0.2.2:3000/' + this.props.user)
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({
@@ -282,7 +282,7 @@ export default class PayPalButton extends Component<{}> {
                     </View>
                   </View>
                 }
-                {this.props.cart.subtotal &&
+                {(this.props.cart.subtotal || this.props.cart.subtotal == 0) &&
                   <View style={styles.splitRow}>
                     <Text style={styles.headerText}>Subtotal</Text>
                     <Text style={styles.headerText}>
@@ -290,7 +290,7 @@ export default class PayPalButton extends Component<{}> {
                     </Text>
                   </View>
                 }
-                {this.props.cart.tax &&
+                {(this.props.cart.tax || this.props.cart.tax == 0) &&
                   <View style={styles.splitRow}>
                     <Text style={styles.headerText}>Tax</Text>
                     <Text style={styles.headerText}>
@@ -298,15 +298,15 @@ export default class PayPalButton extends Component<{}> {
                     </Text>
                   </View>
                 }
-                {this.props.cart.shipping &&
+                {(this.props.cart.shipping || this.props.cart.shipping == 0) &&
                   <View style={styles.splitRow}>
                     <Text style={styles.headerText}>Shipping</Text>
                     <Text style={styles.headerText}>
-                      {this.toPrice(this.props.cart.shipping)}
+                      {this.toPrice(0)}
                     </Text>
                   </View>
                 }
-                {this.props.cart.discount &&
+                {(this.props.cart.discount || this.props.cart.discount == 0) &&
                   <View style={styles.splitRow}>
                     <Text style={styles.headerText}>
                       Discounts & Special Offers
