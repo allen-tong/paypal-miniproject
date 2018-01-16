@@ -30,7 +30,7 @@ export default class PayPalButton extends Component<{}> {
   }
 
   getInfo() {
-    fetch('http://10.0.2.2:3000/' + this.props.user)
+    fetch('http://10.0.2.2:3000/' + this.props.user, fetchInit)
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({
@@ -350,6 +350,15 @@ export default class PayPalButton extends Component<{}> {
       </View>
     );
   }
+};
+
+const fetchInit = {
+  method: 'GET',
+  headers: {
+    'content-type': 'application/json'
+  },
+  mode: 'cors',
+  credentials: 'include'
 };
 
 const rightAngle = String.fromCharCode(10217);
