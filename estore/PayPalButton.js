@@ -121,6 +121,9 @@ export default class PayPalButton extends Component<{}> {
               onRequestClose={() => this.closeAddressList()}
             >
               <View style={styles.modal}>
+                <Text style={[styles.textElement, styles.headerText]}>
+                  Select shipping address
+                </Text>
                 <FlatList
                   data={this.state.addresses}
                   renderItem={({item}) => (
@@ -296,7 +299,7 @@ export default class PayPalButton extends Component<{}> {
                   <View style={styles.splitRow}>
                     <Text style={styles.headerText}>Shipping</Text>
                     <Text style={styles.headerText}>
-                      {this.toPrice(0)}
+                      {this.toPrice(this.props.cart.shipping)}
                     </Text>
                   </View>
                 }
