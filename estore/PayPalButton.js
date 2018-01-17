@@ -12,6 +12,7 @@ import {
   TouchableHighlight,
   View
 } from 'react-native';
+import PropTypes from 'prop-types';
 
 export default class PayPalButton extends Component<{}> {
   constructor(props) {
@@ -351,6 +352,23 @@ export default class PayPalButton extends Component<{}> {
       </View>
     );
   }
+};
+
+PayPalButton.propTypes = {
+  user: PropTypes.string.isRequired,
+  cart: PropTypes.shape({
+    items: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string,
+      quantity: PropTypes.number,
+      price: PropTypes.number
+    })),
+    subtotal: PropTypes.number,
+    tax: PropTypes.number,
+    shipping: PropTypes.number,
+    discount: PropTypes.number,
+    total: PropTypes.number.isRequired
+  })
 };
 
 class BackButton extends Component {
